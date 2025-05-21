@@ -1,5 +1,5 @@
-# This script actually part of wg-custom repository (https://github.com/alex-dv9/database.git)
-# --- Please keep in mind that I'M NOT CODER AT ALL so I have all rights to write bad code :) ---
+# This script actually part of wg-custom repository (https://github.com/alex-dv9/wg-custom)
+# --- Please keep in mind that I'M NOT A CODER AT ALL so I have all rights to write bad code :) ---
 
 import configparser, re
 from io import StringIO

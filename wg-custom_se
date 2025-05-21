@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# https://github.com/alex-dv9/database.git
+# This script actually part of wg-custom repository (https://github.com/alex-dv9/wg-custom)
 
 case $1 in
   pre) systemctl stop wg-custom.service ;;
