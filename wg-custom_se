@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# https://github.com/alex-dv9/database.git
+
+case $1 in
+  pre) systemctl stop wg-custom.service ;;
+  post) systemctl start wg-custom.service & ;;
+esac

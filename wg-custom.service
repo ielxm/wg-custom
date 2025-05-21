@@ -1,0 +1,14 @@
+[Unit]
+Description=Custom WireGuard service
+After=network-online.service
+Wants=network-online.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/wg-custom
+ExecStop=/bin/ip link set wg0 down
+RemainAfterExit=yes
+User=root
+
+[Install]
+WantedBy=multi-user.target

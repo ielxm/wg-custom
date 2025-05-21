@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# https://github.com/alex-dv9/database.git
+
+if [ "$(whoami)" != "root" ]; then echo "[permissions error] please run cwg as root"; exit 1; fi
+
+for ((i=1; i<=30; i++)); do
+  if ping -c 1 -W 1 1.1.1.1 > /dev/null 2>&1; then
+    echo "[status] connection was successfully established"; break
+  fi; sleep 1
+done
+
+if (( i > 30 )); then
+  echo "[connection error] please check if your internet connection is ok"; exit 1
+fi
+
+### ------------------------------#
+
+source /etc/wg-custom/config
+
+RANDOM_LISTENPORT=$((RANDOM % 50000 + 10000))
+RANDOM_ENDPOINTPORT=$((RANDOM % 50000 + 10000))
+
+### ------------------------------#
+
+ip link add dev wg0 type wireguard
+ip addr add $CONFIG_PEERADDRESS dev wg0
+
+wg set wg0 private-key <(echo $CONFIG_PRIVATEKEY)
+wg set wg0 listen-port $RANDOM_LISTENPORT
+wg set wg0 peer $CONFIG_PUBLICKEY allowed-ips "0.0.0.0/0" endpoint $CONFIG_ENDPOINTIP:$RANDOM_ENDPOINTPORT
+
+wg set wg0 fwmark 2244
+
+nping --udp --count 1 --data-length $((RANDOM%25+9)) --source-port $RANDOM_LISTENPORT --dest-port $RANDOM_ENDPOINTPORT $CONFIG_ENDPOINTIP
+
+ip link set wg0 up
+
+ip route add default via ${CONFIG_PEERADDRESS%%/*} table 100 metric 50
+ip route add default via $(ip route show default table main | awk '/default/ {print $3}') table 100 metric 100
+
+ip rule add not fwmark 2244 table 100
+ip rule add table main suppress_prefixlength 0
+
+echo "nameserver $CONFIG_DNSSERVER" | resolvconf -a wg0 -x
