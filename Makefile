@@ -23,4 +23,3 @@ uninstall:
 uninstallcfg:
 	@echo "Do you want to remove /etc/wg-custom/config too? (y/n)"
 	@read answer && if [ $$answer = "y" ]; then rm -r /etc/wg-custom/; echo "/etc/wg-custom/config was successfully removed."; fi
-

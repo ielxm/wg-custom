@@ -4,97 +4,95 @@
 import configparser, re
 from io import StringIO
 
-def configExtractor():
+def refactorWireguardConfig(): # to configparser-readable format
 
   # --- Extract all lines from given WireGuard configuration file
 
-  wireguard_config_path = str(input("Please type full path to WireGuard .conf file below:\n--- "))
+  wireguardConfigPath = str(input("Please type full path to WireGuard .conf file below:\n--- "))
   
-  with open(wireguard_config_path, "r") as f:
-    wireguard_config_text = f.read()
+  with open(wireguardConfigPath, "r") as f:
+    wireguardConfigText = f.read()
 
-  return wireguard_config_text
+  return wireguardConfigText
 
-def configRefactor(config_text):
+def configRefactor(wireguardConfigText):
 
-  # --- Refactor given WireGuard configuration file's text
+  refactoredWireguardConfigArray = []
 
-  refactored_config_lines_array = []
+  for line in wireguardConfigText.strip().splitlines():
+    refactoredLine = line.strip()
 
-  for line in config_text.strip().splitlines():
-    refactored_line = line.strip()
-
-    if not refactored_line or refactored_line.startswith("#"):
+    if not refactoredLine or refactoredLine.startswith("#"):
       continue
 
-    line = re.sub(r"\s*#.*$", "", refactored_line).strip()
-    refactored_config_lines_array.append(refactored_line)
+    line = re.sub(r"\s*#.*$", "", refactoredLine).strip()
+    refactoredWireguardConfigArray.append(refactoredLine)
     
-  refactored_config_text = "\n".join(refactored_config_lines_array)
+  refactoredWireguardConfigText = "\n".join(refactoredWireguardConfigArray)
 
-  return refactored_config_text
+  return refactoredWireguardConfigText
 
-def configParser(refactored_config_text):
+def parseRefactoredWireguardConfig(refactored_config_text):
 
   # --- Parse refactored WireGuard configuration file text
 
   parser = configparser.ConfigParser(allow_no_value=False, strict=False, delimiters=("="))
   parser.read_file(StringIO(refactored_config_text))
 
-  parsing_result = {}
+  parsingResultDictionary = {}
 
   if "Interface" in parser:
-    parsing_result["PrivateKey"] = parser["Interface"].get("PrivateKey")
-    parsing_result["Address"] = parser["Interface"].get("Address")
-    parsing_result["DNS"] = parser["Interface"].get("DNS")
+    parsingResultDictionary["PrivateKey"] = parser["Interface"].get("PrivateKey")
+    parsingResultDictionary["Address"] = parser["Interface"].get("Address")
+    parsingResultDictionary["DNS"] = parser["Interface"].get("DNS")
 
   if "Peer" in parser:
-    parsing_result["PublicKey"] = parser["Peer"].get("PublicKey")
+    parsingResultDictionary["PublicKey"] = parser["Peer"].get("PublicKey")
 
-    endpoint_scratch = parser["Peer"].get("Endpoint")
+    parsedEndpointSetting = parser["Peer"].get("Endpoint")
 
-    if endpoint_scratch:
-      m = re.match(r"([^:]+):(\d+)", endpoint_scratch)
+    if parsedEndpointSetting:
+      parsedEndpointSettingReGroup = re.match(r"([^:]+):(\d+)", parsedEndpointSetting)
 
-      if m:
-        parsing_result["EndpointAddress"] = m.group(1)
-        parsing_result["EndpointPort"] = m.group(2)
+      if parsedEndpointSettingReGroup:
+        parsingResultDictionary["EndpointAddress"] = parsedEndpointSettingReGroup.group(1)
+        parsingResultDictionary["EndpointPort"] = parsedEndpointSettingReGroup.group(2)
 
-  return parsing_result
+  return parsingResultDictionary
 
-def configCreator(parsed_config):
+def generateCompatibleConfig(parsingResultDictionary):
 
   # --- Finally, after all these functions iterations, we are creating wg-custom compatible configuration file
 
-  print("!!! Configuration file will be stored in current directory")
+  print("[ALERT] Configuration file will be stored in current directory")
   
-  wgcustom_config_location = "config_template"
+  wgcustom_config_location = "config_template_1"
 
   with open(wgcustom_config_location, "w") as f:
     
-    f.write(f"CONFIG_PRIVATEKEY='{parsed_config["PrivateKey"]}'\n")
-    f.write(f"CONFIG_PUBLICKEY='{parsed_config["PublicKey"]}'\n")
-    f.write(f"CONFIG_PEERADDRESS='{parsed_config["Address"]}'\n")
-    f.write(f"CONFIG_ENDPOINTIP='{parsed_config["EndpointAddress"]}'\n")
-    f.write(f"CONFIG_DNSSERVER='{parsed_config["DNS"]}'")
+    f.write(f"CONFIG_PRIVATEKEY='{parsingResultDictionary["PrivateKey"]}'\n")
+    f.write(f"CONFIG_PUBLICKEY='{parsingResultDictionary["PublicKey"]}'\n")
+    f.write(f"CONFIG_PEERADDRESS='{parsingResultDictionary["Address"]}'\n")
+    f.write(f"CONFIG_ENDPOINTIP='{parsingResultDictionary["EndpointAddress"]}'\n")
+    f.write(f"CONFIG_DNSSERVER='{parsingResultDictionary["DNS"]}'")
 
-  print("!!! Configuration file was successfully generated !!!")
+  print("[ALERT] Configuration file was successfully generated")
 
   return 0 
 
 def main():
   
   # Extract lines from provided WireGuard configuration file
-  wireguard_config_text = configExtractor()
+  wireguardConfigText = refactorWireguardConfig()
   
   # Refactor extracted lines to configparser python module format
-  refactored_config_text = configRefactor(wireguard_config_text)
+  refactoredWireguardConfigText = configRefactor(wireguardConfigText)
   
   # Actually parse all these refactored lines
-  parsed_config = configParser(refactored_config_text)
+  parsingResultDictionary = parseRefactoredWireguardConfig(refactoredWireguardConfigText)
 
   # Create wg-custom compatible configuration file
-  configCreator(parsed_config)
+  generateCompatibleConfig(parsingResultDictionary)
 
 if __name__ == "__main__":
   main()
