@@ -66,9 +66,9 @@ def generateCompatibleConfig(parsingResultDictionary):
 
   print("[ALERT] Configuration file will be stored in current directory")
   
-  wgcustom_config_location = "config_template_1"
+  wgcustomConfigPath = "config_template"
 
-  with open(wgcustom_config_location, "w") as f:
+  with open(wgcustomConfigPath, "w") as f:
     
     f.write(f"CONFIG_PRIVATEKEY='{parsingResultDictionary["PrivateKey"]}'\n")
     f.write(f"CONFIG_PUBLICKEY='{parsingResultDictionary["PublicKey"]}'\n")
