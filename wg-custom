@@ -32,7 +32,7 @@ wg set wg0 peer $CONFIG_PUBLICKEY allowed-ips "0.0.0.0/0" endpoint $CONFIG_ENDPO
 
 wg set wg0 fwmark 2244
 
-nping --udp --count 1 --data-length $((RANDOM%25+9)) --source-port $RANDOM_LISTENPORT --dest-port $RANDOM_ENDPOINTPORT $CONFIG_ENDPOINTIP
+nping --udp --count 1 --data-length $((RANDOM%25+3)) --source-port $RANDOM_LISTENPORT --dest-port $RANDOM_ENDPOINTPORT $CONFIG_ENDPOINTIP
 
 ip link set wg0 up
 
