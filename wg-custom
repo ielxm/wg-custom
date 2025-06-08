@@ -35,6 +35,7 @@ wg set wg0 fwmark 2244
 nping --udp --count 1 --data-length $((RANDOM%25+3)) --source-port $RANDOM_LISTENPORT --dest-port $RANDOM_ENDPOINTPORT $CONFIG_ENDPOINTIP
 
 ip link set wg0 up
+ip link set wg0 mtu 1380 
 
 ip route add default via ${CONFIG_PEERADDRESS%%/*} table 100 metric 50
 ip route add default via $(ip route show default table main | awk '/default/ {print $3}') table 100 metric 100
