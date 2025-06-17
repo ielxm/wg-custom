@@ -46,7 +46,10 @@ ip rule add table main suppress_prefixlength 0
 if systemctl is-active systemd-resolved; then
   echo "[!] systemd-resolved detected! Using resolvectl to set up wg0 DNS servers." 
   resolvectl dns wg0 $CONFIG_DNSSERVER
+  resolvectl domain wg0 "~." # fix dns leak
+
+  resolvectl flush-caches
 else
   echo "[!] systemd-resolved wasn't detected! Using generic way (resolvconf) to set up wg0 DNS servers." 
-  echo "nameserver $CONFIG_DNSSERVER" | resolvconf -a wg0 -x
+  echo "nameserver $CONFIG_DNSSERVER" | resolvconf -a wg0 -x # dns leak??? idk
 fi
