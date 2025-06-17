@@ -2,16 +2,16 @@
 
 # This script actually part of wg-custom repository (https://github.com/alex-dv9/wg-custom)
 
-if [ "$(whoami)" != "root" ]; then echo "[permissions error] please run cwg as root"; exit 1; fi
+if [ "$(whoami)" != "root" ]; then echo "[-] Permissions error! Please run cwg as root."; exit 1; fi
 
 for ((i=1; i<=30; i++)); do
   if ping -c 1 -W 1 1.1.1.1 > /dev/null 2>&1; then
-    echo "[status] connection was successfully established"; break
+    echo "[!] Connection was successfully established."; break
   fi; sleep 1
 done
 
 if (( i > 30 )); then
-  echo "[connection error] please check if your internet connection is ok"; exit 1
+  echo "[-] Connection error! Please ensure that you have internet access."; exit 1
 fi
 
 ### ------------------------------#
@@ -43,4 +43,10 @@ ip route add default via $(ip route show default table main | awk '/default/ {pr
 ip rule add not fwmark 2244 table 100
 ip rule add table main suppress_prefixlength 0
 
-echo "nameserver $CONFIG_DNSSERVER" | resolvconf -a wg0 -x
+if systemctl is-active systemd-resolved; then
+  echo "[!] systemd-resolved detected! Using resolvectl to set up wg0 DNS servers." 
+  resolvectl dns wg0 $CONFIG_DNSSERVER
+else
+  echo "[!] systemd-resolved wasn't detected! Using generic way (resolvconf) to set up wg0 DNS servers." 
+  echo "nameserver $CONFIG_DNSSERVER" | resolvconf -a wg0 -x
+fi
