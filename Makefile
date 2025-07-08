@@ -2,8 +2,8 @@ all: install
 
 checkdependencies:
 	@echo "Checking if you have all requirements (nmap & resolvconf) installed..."
-	if [ ! -f /bin/nping ] || [ ! -f /bin/resolvconf ] || [ ! -f /bin/wg ]; \
-		then echo "Please ensure that you have nmap and resolvconf (both systemd and openresolv are supported) installed."; exit 1; \
+	if [ ! -f /bin/nping ] || [ ! -f /bin/wg ]; \
+		then echo "Please ensure that you have all dependencies installed."; exit 1; \
 	else echo "--- checkdependencies :: Everything is OK. ---"; fi
 
 install: checkdependencies

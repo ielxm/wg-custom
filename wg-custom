@@ -1,6 +1,6 @@
 #!/bin/bash
-
-# This script actually part of wg-custom repository (https://github.com/alex-dv9/wg-custom)
+# https://github.com/alex-dv9/wg-custom
+# created by alex-dv9
 
 if [ "$(whoami)" != "root" ]; then echo "[-] Permissions error! Please run cwg as root."; exit 1; fi
 
@@ -43,13 +43,5 @@ ip route add default via $(ip route show default table main | awk '/default/ {pr
 ip rule add not fwmark 2244 table 100
 ip rule add table main suppress_prefixlength 0
 
-if systemctl is-active systemd-resolved; then
-  echo "[!] systemd-resolved detected! Using resolvectl to set up wg0 DNS servers." 
-  resolvectl dns wg0 $CONFIG_DNSSERVER
-  resolvectl domain wg0 "~." # fix dns leak
-
-  resolvectl flush-caches
-else
-  echo "[!] systemd-resolved wasn't detected! Using generic way (resolvconf) to set up wg0 DNS servers." 
-  echo "nameserver $CONFIG_DNSSERVER" | resolvconf -a wg0 -x # dns leak??? idk
-fi
+resolvectl dns wg0 $CONFIG_DNSSERVER
+resolvectl domain wg0 "~." # fix dns leak

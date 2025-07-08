@@ -5,8 +5,13 @@ Wants=network-online.service
 
 [Service]
 Type=oneshot
+
+ExecStartPre=/bin/resolvectl flush-caches
 ExecStart=/bin/wg-custom
+
 ExecStop=/bin/ip link set wg0 down
+ExecStopPost=/bin/resolvectl flush-caches
+
 RemainAfterExit=yes
 User=root
 
