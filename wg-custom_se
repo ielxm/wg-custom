@@ -3,6 +3,6 @@
 # created by alex-dv9
 
 case $1 in
-  pre) systemctl stop wg-custom.service ;;
-  post) systemctl start wg-custom.service & ;;
+  pre) if systemctl is-enabled --quiet wg-custom; then systemctl stop wg-custom.service ; fi ;;
+  post) if systemctl is-enabled --quiet wg-custom; then systemctl start wg-custom.service & ; fi ;;
 esac
