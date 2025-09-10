@@ -4,10 +4,11 @@
 
 case $1 in
   pre) if [ -f /etc/systemd/system/multi-user.target.wants/wg-custom.service ]; then 
-	 systemctl stop wg-custom.service
-	fi ;;
+	    #systemctl stop wg-custom.service
+        ip link set wg0 down
+    fi ;;
   
   post) if [ -f /etc/systemd/system/multi-user.target.wants/wg-custom.service ]; then 
-	 systemctl start wg-custom.service &
-	fi ;;
+        systemctl restart wg-custom.service &
+    fi ;;
 esac

@@ -25,10 +25,11 @@ RANDOM_ENDPOINTPORT=$((RANDOM % 50000 + 10000))
 
 ip link add dev wg0 type wireguard
 ip addr add $CONFIG_PEERADDRESS dev wg0
+ip -6 addr add "fc00:bbbb:bbbb:bb01::9:b086/128" dev wg0
 
 wg set wg0 private-key <(echo $CONFIG_PRIVATEKEY)
 wg set wg0 listen-port $RANDOM_LISTENPORT
-wg set wg0 peer $CONFIG_PUBLICKEY allowed-ips "0.0.0.0/0" endpoint $CONFIG_ENDPOINTIP:$RANDOM_ENDPOINTPORT
+wg set wg0 peer $CONFIG_PUBLICKEY allowed-ips "0.0.0.0/0,::/0" endpoint $CONFIG_ENDPOINTIP:$RANDOM_ENDPOINTPORT
 
 wg set wg0 fwmark 2244
 
@@ -38,10 +39,14 @@ ip link set wg0 up
 ip link set wg0 mtu 1380 
 
 ip route add default via ${CONFIG_PEERADDRESS%%/*} table 100 metric 50
-ip route add default via $(ip route show default table main | awk '/default/ {print $3}') table 100 metric 100
+ip -6 route add default via fc00:bbbb:bbbb:bb01::9:b086 table 100 metric 50
+#ip route add default via $(ip route show default table main | awk '/default/ {print $3}') table 100 metric 100
 
 ip rule add not fwmark 2244 table 100
+ip -6 rule add not fwmark 2244 table 100
+
 ip rule add table main suppress_prefixlength 0
+ip -6 rule add table main suppress_prefixlength 0
 
 resolvectl dns wg0 $CONFIG_DNSSERVER
 resolvectl domain wg0 "~." # fix dns leak

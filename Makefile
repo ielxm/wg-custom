@@ -11,12 +11,23 @@ install: checkdependencies
 	install -m 755 wg-custom_se /lib/systemd/system-sleep/wg-custom
 	install -m 755 wg-custom.service /etc/systemd/system/wg-custom.service
 	
-	install -Dm644 config_template /etc/wg-custom/config
+	install -Dm600 config_template /etc/wg-custom/config
 
 	systemctl daemon-reload
 	
 	@echo "Do you want to enable and start wg-custom.service? (y/n)"
 	@read answer && if [ $$answer = "y" ]; then systemctl enable --now wg-custom.service; echo "wg-custom.service was successfully enabled and started."; fi
+
+reinstall: checkdependencies
+	install -m 755 wg-custom /bin/wg-custom
+	install -m 755 wg-custom_se /lib/systemd/system-sleep/wg-custom
+	install -m 755 wg-custom.service /etc/systemd/system/wg-custom.service
+	
+	install -Dm600 config_template /etc/wg-custom/config
+
+	systemctl daemon-reload
+
+	systemctl restart wg-custom
 
 uninstall:
 	rm /bin/wg-custom
