@@ -1,7 +1,3 @@
 # Custom WireGuard scripts & service
 
-it will bypasses DPI detection of the wireguard protocol using the same way as AmneziaWG </br>
-so, you must connect to a WireGuard server whose IP is not blocked by your ISP </br>
-and your ISP must be bad at being bad </br>
-
-then wg-custom will work for you.
+``wg-custom`` bypasses (it used to bypass) the WireGuard protocol block by modifying (blurring, adding extra random bytes) before the protocol handshake + provides a systemd-service file, a hook for connecting/disconnecting ``wg-custom`` after/before hibernation, and a config converter (WireGuard -> ``wg-custom``).
