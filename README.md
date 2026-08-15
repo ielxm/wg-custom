@@ -1,3 +1,5 @@
 # ``wg-custom``
 
-``wg-custom`` bypasses (it used to bypass) the WireGuard protocol block by modifying (blurring, adding extra random bytes) before the protocol handshake + provides a systemd-service file, a hook for connecting/disconnecting ``wg-custom`` after/before hibernation, and a config converter (WireGuard -> ``wg-custom``).
+## OUTDATED!!
+
+Wrapper around ``wg`` utility that tries to *change* WireGuard protocol's packet header by adding some noise to it. Used to work in Russia in past. Same idea as AmneziaWG.
